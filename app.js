@@ -61,15 +61,25 @@ const notesEl = document.getElementById('notes');
 function createCard(note) {
   const card = document.createElement('li');
   card.className = 'note-card';
+  card.dataset.id = note.id;
 
+  // The button holds only the title, so its accessible name stays short.
+  // CSS stretches its click area over the whole card.
   const title = document.createElement('h2');
   title.className = 'note-card__title';
+  const open = document.createElement('button');
+  open.type = 'button';
+  open.className = 'note-card__open';
+  const label = document.createElement('span');
+  label.className = 'note-card__label';
   if (note.title.trim() === '') {
-    title.textContent = 'Untitled';
+    label.textContent = 'Untitled';
     title.classList.add('note-card__title--untitled');
   } else {
-    title.textContent = note.title;
+    label.textContent = note.title;
   }
+  open.append(label);
+  title.append(open);
   card.append(title);
 
   if (note.text.trim() !== '') {
@@ -109,13 +119,16 @@ const editor = document.getElementById('editor');
 const editorCloseBtn = document.getElementById('editor-close');
 const editorSaveBtn = document.getElementById('editor-save');
 const editorStatus = document.getElementById('editor-status');
+const editorHeading = document.getElementById('editor-heading');
 const titleInput = document.getElementById('note-title');
 const textArea = document.getElementById('note-text');
 
 const AUTOSAVE_DELAY = 500;
 
-// Id of the note being edited; null until the first save creates it.
+// Id of the note being edited; for a new note, null until the first save.
 let currentId = null;
+// Id of the card that opened the editor; focus returns to it on close.
+let returnFocusId = null;
 let saveTimer = null;
 // True when the last write to storage failed, so an unchanged save retries it.
 let writeFailed = false;
@@ -177,12 +190,23 @@ function scheduleSave() {
   saveTimer = setTimeout(saveEditor, AUTOSAVE_DELAY);
 }
 
-function openEditor() {
-  currentId = null;
+// Opens the editor for an existing note by id, or for a new note without one.
+function openEditor(id = null) {
+  const note = id === null ? null : notes.find((n) => n.id === id);
+  if (id !== null && !note) return;
+
+  currentId = note ? note.id : null;
+  returnFocusId = currentId;
   writeFailed = false;
   cancelPendingSave();
   setStatus('');
-  clearEditor();
+  if (note) {
+    titleInput.value = note.title;
+    textArea.value = note.text;
+  } else {
+    clearEditor();
+  }
+  editorHeading.textContent = note ? 'Edit note' : 'New note';
   editor.showModal();
   titleInput.focus();
 }
@@ -203,13 +227,24 @@ editor.addEventListener('close', () => {
 
   render();
 
+  // Back to the opened card at its new position, or to "New note" if the
+  // note was removed or the editor was opened for a new note.
+  const card = returnFocusId === null
+    ? null
+    : notesEl.querySelector(`.note-card[data-id="${CSS.escape(returnFocusId)}"] .note-card__open`);
+  (card || newNoteBtn).focus();
+
   currentId = null;
+  returnFocusId = null;
   clearEditor();
   setStatus('');
-  newNoteBtn.focus();
 });
 
-newNoteBtn.addEventListener('click', openEditor);
+newNoteBtn.addEventListener('click', () => openEditor());
+notesEl.addEventListener('click', (e) => {
+  const open = e.target.closest('.note-card__open');
+  if (open) openEditor(open.closest('.note-card').dataset.id);
+});
 editorCloseBtn.addEventListener('click', closeEditor);
 editorSaveBtn.addEventListener('click', saveEditor);
 
