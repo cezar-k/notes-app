@@ -1,9 +1,83 @@
 'use strict';
 
-// In-memory placeholder; storage comes in a later feature.
-const notes = [];
+// Storage
+
+const STORAGE_KEY = 'notes-app.notes';
+
+function isValidNote(note) {
+  return (
+    note !== null &&
+    typeof note === 'object' &&
+    typeof note.id === 'string' &&
+    typeof note.title === 'string' &&
+    typeof note.text === 'string' &&
+    Number.isFinite(note.updatedAt)
+  );
+}
+
+function loadNotes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === null) return [];
+
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) {
+      console.warn('Stored notes are not a list; starting empty.');
+      return [];
+    }
+
+    const valid = data.filter(isValidNote);
+    if (valid.length !== data.length) {
+      console.warn(`Ignored ${data.length - valid.length} invalid stored note(s).`);
+    }
+    return valid;
+  } catch (err) {
+    console.warn('Could not read notes; starting empty.', err);
+    return [];
+  }
+}
+
+function saveNotes() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  } catch (err) {
+    console.warn('Could not save notes.', err);
+  }
+}
+
+function createId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+let notes = loadNotes();
+
+// Rendering
 
 const notesEl = document.getElementById('notes');
+
+function createCard(note) {
+  const card = document.createElement('li');
+  card.className = 'note-card';
+
+  const title = document.createElement('h2');
+  title.className = 'note-card__title';
+  if (note.title.trim() === '') {
+    title.textContent = 'Untitled';
+    title.classList.add('note-card__title--untitled');
+  } else {
+    title.textContent = note.title;
+  }
+  card.append(title);
+
+  if (note.text.trim() !== '') {
+    const text = document.createElement('p');
+    text.className = 'note-card__text';
+    text.textContent = note.text;
+    card.append(text);
+  }
+
+  return card;
+}
 
 function render() {
   notesEl.replaceChildren();
@@ -13,10 +87,19 @@ function render() {
     empty.className = 'empty-state';
     empty.textContent = 'No notes yet. Create your first note with "New note".';
     notesEl.append(empty);
+    return;
   }
+
+  const grid = document.createElement('ul');
+  grid.className = 'note-grid';
+  const sorted = [...notes].sort((a, b) => b.updatedAt - a.updatedAt);
+  for (const note of sorted) {
+    grid.append(createCard(note));
+  }
+  notesEl.append(grid);
 }
 
-// Editor overlay (no saving yet: closing discards the input)
+// Editor overlay
 
 const newNoteBtn = document.getElementById('new-note-btn');
 const editor = document.getElementById('editor');
@@ -39,8 +122,21 @@ function closeEditor() {
   editor.close();
 }
 
+// Adds the editor content as a new note, unless title and text are both empty.
+function addNoteFromEditor() {
+  const title = titleInput.value;
+  const text = textArea.value;
+  if (title.trim() === '' && text.trim() === '') return;
+
+  notes.push({ id: createId(), title, text, updatedAt: Date.now() });
+  saveNotes();
+  render();
+}
+
 // Fires for every way of closing: Close button, Esc, backdrop click.
+// Save first, then clear the fields.
 editor.addEventListener('close', () => {
+  addNoteFromEditor();
   clearEditor();
   newNoteBtn.focus();
 });
