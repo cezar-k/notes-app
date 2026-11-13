@@ -1,0 +1,93 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: #1f2328;
+  background: #f6f7f9;
+}
+
+/* Header */
+
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+/* Buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: #1a5fd0;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #144bab;
+}
+
+.btn-primary:active {
+  background: #103d8c;
+}
+
+.btn:focus-visible {
+  outline: 3px solid #1a5fd0;
+  outline-offset: 2px;
+}
+
+/* Main area (future card grid) */
+
+.notes {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.empty-state {
+  max-width: 40ch;
+  margin: 64px auto 0;
+  text-align: center;
+  font-size: 1.125rem;
+  color: #57606a;
+}
+
+@media (min-width: 768px) {
+  .app-header__inner,
+  .notes {
+    padding: 24px;
+  }
+}

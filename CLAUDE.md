@@ -15,15 +15,15 @@ Open `index.html` in a browser.
 
 ## Product decisions
 
-- **Grid:** notes shown as a card grid, sorted by last edited first.
+- **Grid:** notes shown as a card grid, sorted by last edited first. "Last edited" updates only when title or text actually changes. The grid re-sorts when the editor closes, not while typing.
 - **Editor:** clicking a card or "New note" opens the editor as an overlay.
   - Desktop: Esc or clicking outside closes it.
   - At 375 px: overlay is full screen with a clear Close button.
-- **Saving:** autosave while typing (short debounce), plus a Save button that saves immediately and briefly shows "Saved".
-- **Empty notes:** a note with empty title and empty text (whitespace counts as empty) is not created, or is discarded.
+- **Saving:** autosave while typing (short debounce). The Save button saves immediately and keeps the editor open. One small status text ("Saving…" / "Saved") shows for both.
+- **Empty notes:** a note with empty title and empty text (whitespace counts as empty) is not created, or is discarded. A saved note whose title and text are both emptied is discarded silently when the editor closes.
 - **Untitled:** a note with text but no title shows as "Untitled".
 - **Title field:** Enter moves focus to the text field.
-- **Delete:** asks for confirmation inside the app — never use the browser's `confirm()`.
+- **Delete:** only in the editor overlay. It asks for confirmation inside the app (never the browser's `confirm()`); discarding an emptied note needs no confirmation.
 - **Empty state:** show a readable message when there are no notes.
 - **Layout:** must work at 1280 px and 375 px with nothing overflowing; buttons look like buttons; good contrast.
 
