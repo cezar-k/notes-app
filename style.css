@@ -83,7 +83,6 @@ body {
   text-align: center;
   font-size: 1.125rem;
   color: #57606a;
-  overflow-wrap: anywhere;
 }
 
 @media (min-width: 768px) {

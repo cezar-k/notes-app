@@ -11,7 +11,7 @@ function render() {
   if (notes.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'empty-state';
-    empty.textContent = 'No notes yet. Click "New note" to create one.';
+    empty.textContent = 'No notes yet. Create your first note with New note.';
     notesEl.append(empty);
   }
 }
