@@ -20,7 +20,7 @@ Open `index.html` in a browser.
   - Desktop: Esc or clicking outside closes it.
   - At 375 px: overlay is full screen with a clear Close button.
 - **Saving:** autosave while typing (short debounce). The Save button saves immediately and keeps the editor open. One small status text ("Saving…" / "Saved") shows for both.
-- **Empty notes:** a note with empty title and empty text (whitespace counts as empty) is not created, or is discarded. A saved note whose title and text are both emptied is discarded silently when the editor closes. While the editor is open, autosave does not write an emptied note, so storage keeps its last content; the note is removed when the editor closes.
+- **Empty notes:** a note with empty title and empty text (whitespace counts as empty) is not created, or is discarded. A saved note whose title and text are both emptied keeps its last content in storage while the editor is open (autosave skips it; reloading the page keeps it) and is discarded silently when the editor closes.
 - **Untitled:** a note with text but no title shows as "Untitled".
 - **Title field:** Enter moves focus to the text field.
 - **Delete:** only in the editor overlay. It asks for confirmation inside the app (never the browser's `confirm()`); discarding an emptied note needs no confirmation.
