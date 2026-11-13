@@ -37,11 +37,14 @@ function loadNotes() {
   }
 }
 
+// Returns true if the notes were written to storage.
 function saveNotes() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    return true;
   } catch (err) {
     console.warn('Could not save notes.', err);
+    return false;
   }
 }
 
@@ -104,15 +107,81 @@ function render() {
 const newNoteBtn = document.getElementById('new-note-btn');
 const editor = document.getElementById('editor');
 const editorCloseBtn = document.getElementById('editor-close');
+const editorSaveBtn = document.getElementById('editor-save');
+const editorStatus = document.getElementById('editor-status');
 const titleInput = document.getElementById('note-title');
 const textArea = document.getElementById('note-text');
+
+const AUTOSAVE_DELAY = 500;
+
+// Id of the note being edited; null until the first save creates it.
+let currentId = null;
+let saveTimer = null;
+// True when the last write to storage failed, so an unchanged save retries it.
+let writeFailed = false;
+
+function setStatus(text) {
+  editorStatus.textContent = text;
+}
+
+function cancelPendingSave() {
+  clearTimeout(saveTimer);
+  saveTimer = null;
+}
+
+function editorIsEmpty() {
+  return titleInput.value.trim() === '' && textArea.value.trim() === '';
+}
 
 function clearEditor() {
   titleInput.value = '';
   textArea.value = '';
 }
 
+// The single save path for autosave, the Save button and closing.
+// Creates the note on first save, then updates the same note by id.
+function saveEditor() {
+  cancelPendingSave();
+
+  // Nothing to save. An emptied saved note keeps its last content in storage
+  // and is removed when the editor closes.
+  if (editorIsEmpty()) {
+    setStatus('');
+    return;
+  }
+
+  const title = titleInput.value;
+  const text = textArea.value;
+  const note = notes.find((n) => n.id === currentId);
+
+  if (!note) {
+    currentId = createId();
+    notes.push({ id: currentId, title, text, updatedAt: Date.now() });
+  } else if (note.title !== title || note.text !== text) {
+    note.title = title;
+    note.text = text;
+    note.updatedAt = Date.now();
+  } else if (!writeFailed) {
+    // Unchanged and already stored: keep "last edited" as it is.
+    setStatus('Saved');
+    return;
+  }
+
+  writeFailed = !saveNotes();
+  setStatus(writeFailed ? "Couldn't save" : 'Saved');
+}
+
+function scheduleSave() {
+  setStatus('Saving…');
+  cancelPendingSave();
+  saveTimer = setTimeout(saveEditor, AUTOSAVE_DELAY);
+}
+
 function openEditor() {
+  currentId = null;
+  writeFailed = false;
+  cancelPendingSave();
+  setStatus('');
   clearEditor();
   editor.showModal();
   titleInput.focus();
@@ -122,27 +191,35 @@ function closeEditor() {
   editor.close();
 }
 
-// Adds the editor content as a new note, unless title and text are both empty.
-function addNoteFromEditor() {
-  const title = titleInput.value;
-  const text = textArea.value;
-  if (title.trim() === '' && text.trim() === '') return;
-
-  notes.push({ id: createId(), title, text, updatedAt: Date.now() });
-  saveNotes();
-  render();
-}
-
 // Fires for every way of closing: Close button, Esc, backdrop click.
-// Save first, then clear the fields.
 editor.addEventListener('close', () => {
-  addNoteFromEditor();
+  saveEditor();
+
+  // A saved note that was emptied is discarded silently.
+  if (currentId !== null && editorIsEmpty()) {
+    notes = notes.filter((n) => n.id !== currentId);
+    saveNotes();
+  }
+
+  render();
+
+  currentId = null;
   clearEditor();
+  setStatus('');
   newNoteBtn.focus();
 });
 
 newNoteBtn.addEventListener('click', openEditor);
 editorCloseBtn.addEventListener('click', closeEditor);
+editorSaveBtn.addEventListener('click', saveEditor);
+
+titleInput.addEventListener('input', scheduleSave);
+textArea.addEventListener('input', scheduleSave);
+
+// Don't lose the last keystrokes if the page is reloaded or closed mid-edit.
+window.addEventListener('pagehide', () => {
+  if (editor.open) saveEditor();
+});
 
 // Backdrop click: the panel fills the dialog box, so a click whose target is
 // the dialog itself came from the backdrop. Require the press to start there

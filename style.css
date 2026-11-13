@@ -189,7 +189,19 @@ body:has(.editor[open]) {
 
 .editor__header {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 8px;
+}
+
+.editor__status {
+  min-width: 0;
+  margin: 0 auto 0 0;
+  overflow: hidden;
+  font-size: 0.875rem;
+  color: #57606a;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .editor__title,
