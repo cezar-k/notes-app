@@ -64,9 +64,35 @@ body {
   background: #103d8c;
 }
 
+.btn-secondary {
+  background: #ffffff;
+  color: #1f2328;
+  border-color: #8c959f;
+}
+
+.btn-secondary:hover {
+  background: #eef1f4;
+}
+
+.btn-secondary:active {
+  background: #e1e6eb;
+}
+
 .btn:focus-visible {
   outline: 3px solid #1a5fd0;
   outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Main area (future card grid) */
@@ -83,6 +109,102 @@ body {
   text-align: center;
   font-size: 1.125rem;
   color: #57606a;
+}
+
+/* Editor overlay */
+
+body:has(.editor[open]) {
+  overflow: hidden;
+}
+
+.editor {
+  width: min(600px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 64px);
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  color: inherit;
+  background: #ffffff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.editor::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.editor__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+  padding: 16px;
+}
+
+.editor__header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.editor__title,
+.editor__text {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #8c959f;
+  border-radius: 8px;
+  font: inherit;
+  color: inherit;
+  background: #ffffff;
+}
+
+.editor__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.editor__text {
+  min-height: 200px;
+  resize: vertical;
+}
+
+.editor__title:focus-visible,
+.editor__text:focus-visible {
+  outline: 3px solid #1a5fd0;
+  outline-offset: 2px;
+}
+
+.editor__title::placeholder,
+.editor__text::placeholder {
+  color: #6e7781;
+}
+
+@media (max-width: 600px) {
+  .editor {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .editor__panel {
+    height: 100%;
+  }
+
+  .editor__header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: -16px -16px 0;
+    padding: 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #d0d7de;
+  }
+
+  .editor__text {
+    flex: 1;
+    resize: none;
+  }
 }
 
 @media (min-width: 768px) {
