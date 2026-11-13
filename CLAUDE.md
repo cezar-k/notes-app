@@ -23,14 +23,10 @@ Open `index.html` in a browser.
 - **Empty notes:** a note with empty title and empty text (whitespace counts as empty) is not created, or is discarded. A saved note whose title and text are both emptied keeps its last content in storage while the editor is open (autosave skips it; reloading the page keeps it) and is discarded silently when the editor closes.
 - **Untitled:** a note with text but no title shows as "Untitled".
 - **Title field:** Enter moves focus to the text field.
-- **Delete:** only in the editor overlay. It asks for confirmation inside the app (never the browser's `confirm()`); discarding an emptied note needs no confirmation.
 - **Empty state:** show a readable message when there are no notes.
 - **Layout:** must work at 1280 px and 375 px with nothing overflowing; buttons look like buttons; good contrast.
 
-### Stretch / later
-
-- Live search over title and text (stretch).
-- Maybe later: note counter, saved light/dark theme toggle.
+Out of scope (project ended after feature 3): delete, search, note counter, theme toggle.
 
 ## Rules
 
