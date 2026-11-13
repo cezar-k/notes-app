@@ -16,6 +16,21 @@
 
   <main id="notes" class="notes"></main>
 
+  <dialog id="editor" class="editor" aria-labelledby="editor-heading">
+    <div class="editor__panel">
+      <div class="editor__header">
+        <h2 id="editor-heading" class="visually-hidden">Edit note</h2>
+        <p id="editor-status" class="editor__status" role="status" aria-live="polite"></p>
+        <button type="button" id="editor-save" class="btn btn-primary">Save</button>
+        <button type="button" id="editor-close" class="btn btn-secondary">Close</button>
+      </div>
+      <label for="note-title" class="visually-hidden">Title</label>
+      <input id="note-title" class="editor__title" type="text" placeholder="Title" autocomplete="off">
+      <label for="note-text" class="visually-hidden">Note</label>
+      <textarea id="note-text" class="editor__text" placeholder="Take a note…"></textarea>
+    </div>
+  </dialog>
+
   <script src="app.js" defer></script>
 </body>
 </html>
